@@ -24,6 +24,8 @@ cogs_list = [
     'announces',
     'verification',
     'playtime',
+    'Restart',
+    'Log',
 ]
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
