@@ -15,14 +15,15 @@ room_no = 0
 class Voices(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
+        self.log= 1404332603691241573
+ 
     async def noti(self, member, channel, message):
+        LOG=await self.bot.fetch_channel(self.log)
         username = member.display_name.split('[')
         tts_message = f'{username[0]} {message}'
         if not self.bot.voice_clients:
             try:
                 vc = await channel.connect()
-                print(username,"join the room")
             except:
                 vc = self.bot.voice_clients[0]
                 print("Bot is busy in another room")
@@ -93,21 +94,50 @@ class Voices(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
+        LOG=await self.bot.fetch_channel(self.log)
         if before.channel is None and after.channel is not None and not after.afk and not member.bot:
-            print(member,'เข้ามาในห้องแล้ว')
             message = 'เข้ามาในห้องแล้ว'
             await self.noti(member, after.channel, message)
+            embed=discord.Embed(
+                title="JOIN VOICE CHAT",
+                description= f"{member.display_name} เข้าห้อง {after.channel.mention}.",
+                color=discord.Color.dark_purple()
+            )
+            embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+            await LOG.send(embed=embed)
+            print(member,'เข้ามาในห้องแล้ว')
             coins = self.bot.get_cog('Coins')
             coin = random.random()
         elif after.channel and before.channel and before.channel != after.channel and not member.bot:
             message = 'ย้ายมาในห้องนี้แล้ว'
             await self.noti(member, after.channel, message)
+            embed1=discord.Embed(
+                title="MOVE VOICE CHAT",
+                description= f"{member.display_name} ย้ายจาก {before.channel.mention} ไป {after.channel.mention} ",
+                color=discord.Color.dark_purple()
+            )
+            embed1.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+            await LOG.send(embed=embed1)
         elif after.channel and before.afk and not after.afk and not member.bot:
             message = 'กลับมาจาก AFK แล้ว'
             await self.noti(member, after.channel, message)
+            embed2=discord.Embed(
+                title="AFK",
+                description= f"{member.display_name} ได้กลับมาจากการ AFK แล้ว",
+                color=discord.Color.dark_purple()
+            )
+            embed2.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+            await LOG.send(embed=embed2)
         elif after.channel is None and before.channel is not None and not before.afk and not member.bot:
             message = 'ออกห้องไปแล้ว'
             await self.noti(member, before.channel, message)
+            embed3=discord.Embed(
+                title="LEAVE VOICE CHAT",
+                description= f"{member.display_name} ออกจากห้อง {before.channel.mention}.",
+                color=discord.Color.dark_purple()
+            )
+            embed3.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+            await LOG.send(embed=embed3)
 
 
     @discord.slash_command(name='summon', description='This command will make the bot join the voice channel')
